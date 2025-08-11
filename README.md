@@ -152,6 +152,13 @@ If you see a warning like `DigMontage is only a subset…`, it means some channe
 -   mne, numpy, scipy, matplotlib
 -   tkinter (usually bundled with Python; on some Linux distributions, install with `sudo apt-get install python3-tk`)
 
-**Install command:**
-```bash
-pip install -U mne numpy scipy matplotlib
+# 🔍 Interpretation tips
+Filaments/sheets: Structured shapes like filaments and sheets in the 3D plot suggest structured coordination, not just random noise.
+
+High PLV segments: Brightly colored segments (when Color = PLV) on the trajectory indicate moments of transient phase-locking.
+
+Sharp Z excursions: Sudden spikes on the Z-axis (when Z = PhaseSlipRate), especially near Y-axis peaks, can signify phase slips occurring during Moiré "bursts".
+
+Temporal β/γ influence: Up-down movement in temporal regions that correlates with high β/γ weights is often due to muscle (EMG) artifacts. Test this by lowering the β/γ weights.
+
+# Licence MIT 
