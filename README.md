@@ -1,5 +1,7 @@
 ![Regional Attractor Explorer](image.png)
 
+EDIT: The 3d system readme is after this one. 
+
 # Regional Attractor Explorer
 
 Watch brain regions trace their own “state-space” loops.
