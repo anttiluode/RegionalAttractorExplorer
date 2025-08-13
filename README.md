@@ -162,3 +162,99 @@ Sharp Z excursions: Sudden spikes on the Z-axis (when Z = PhaseSlipRate), especi
 Temporal β/γ influence: Up-down movement in temporal regions that correlates with high β/γ weights is often due to muscle (EMG) artifacts. Test this by lowering the β/γ weights.
 
 # Licence MIT 
+
+## Readme for MNEBRAIN Signal VS compsite (based on the first code)
+
+![image2](image2.png)
+
+(Claude may have hyped it up a "bit") 
+
+# EEG Brain Source & Coordination Explorer
+
+Revolutionary Neural Coordination Analysis Tool
+This system implements the Universal Brain Coordination Model, a groundbreaking framework for understanding how
+different brain frequency bands coordinate neural activity in real-time. Moving beyond traditional power spectral
+analysis, this tool reveals the hidden dynamics of neural coordination through advanced source reconstruction and
+cross-frequency coupling analysis.
+
+# 🧠 Core Innovation: Coordinated Power Metric
+
+The system introduces a novel neuroimaging metric: Coordinated Power (Y×PLV)
+
+Y: Multi-band neural activity power (moiré composite of delta, theta, beta, gamma)
+PLV: Phase-Locking Value measuring coordination strength between conductor and orchestra
+Y×PLV: Reveals where and when frequency bands successfully coordinate
+
+This metric captures something entirely new: neural harmony - the precise moments when a conductor frequency (e.g., alpha) successfully orchestrates multi-band neural activity across the brain.
+
+# 🎼 The Universal Brain Coordination Model
+
+Key Concepts:
+
+Conductor Frequencies: Primary rhythms that coordinate neural activity (alpha for vision, gamma for language)
+Neural Orchestra: Multi-band composite signals that respond to conductor coordination
+Phase-Slip Dynamics: Real-time coordination failures and recoveries
+3D Neural Trajectories: Geometric visualization of coordination patterns in brain space
+
+# 🔬 Technical Features
+
+Advanced Source Reconstruction:
+
+Multiple inverse methods (sLORETA, dSPM, MNE, eLORETA)
+3-layer BEM modeling for accurate EEG source localization
+Automated fsaverage brain template integration
+
+# Coordination Analysis Pipeline:
+
+Broadband source reconstruction with frequency-specific filtering
+Hilbert transform phase extraction for conductor and orchestra signals
+Real-time Phase-Locking Value calculation
+Time-resolved coordination mapping
+
+# Interactive Visualization:
+
+Real-time 3D brain visualization with MNE-Python
+Multiple coordination metrics (Conductor Power, Moiré Harmony, Phase-Slip Rate, Coordinated Power)
+Dynamic time-course analysis with coordinated hotspot identification
+
+# Research Applications:
+
+Neural Coordination Biomarkers: Identify coordination disruptions in neurological conditions
+Cognitive State Monitoring: Real-time tracking of attention, language, and memory coordination
+Brain-Computer Interfaces: Leverage coordination patterns for enhanced neural control
+
+Clinical Potential:
+
+Consciousness Assessment: Coordination complexity as consciousness biomarker
+Stroke Rehabilitation: Target coordination recovery in specific brain regions
+ADHD/Autism Research: Investigate coordination differences in neurodevelopmental conditions
+
+# 🚀 Getting Started
+
+Requirements:
+
+Python 3.8+
+MNE-Python for EEG processing
+PyVista/PyVistaQt for 3D visualization
+Standard scientific Python stack (NumPy, SciPy, Matplotlib)
+
+# Quick Start:
+
+Download the mnebrain_signalvs_composite3.py
+
+Then download the requirements.txt 
+
+install the requirements: 
+
+pip install requirements.txt 
+
+run the code. 
+
+python mnebrain_signalvs_composite3.py
+
+Load EEG file (supports .edf, .bdf, .fif, .set formats)
+Select coordination model settings (conductor frequency, orchestra composition)
+Run processing pipeline for automatic source reconstruction and coordination analysis
+Explore real-time 3D brain coordination visualizations
+
+# Licence MIT
