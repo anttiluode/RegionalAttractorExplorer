@@ -2,6 +2,10 @@
 
 EDIT: The 3d system readme is after this one. 
 
+EDIT: Added AI Autoencoder signal analysis tool that suggests thre are multiple 
+conductors and results vary between subjects. The results are analyzed by Gemini at the end of 
+the readme. 
+
 # Regional Attractor Explorer
 
 Watch brain regions trace their own “state-space” loops.
@@ -260,3 +264,41 @@ Run processing pipeline for automatic source reconstruction and coordination ana
 Explore real-time 3D brain coordination visualizations
 
 # Licence MIT
+
+# AI Autoencoder results: 
+
+The autoencoder analysis revealed that brain activity is organized into a flexible repertoire
+of distinct states rather than being governed by a single, fixed "conductor" frequency in each
+region. This data-driven approach provided a more nuanced view than previous methods.
+
+Key Findings
+
+Consistent Flexibility in Higher-Order Brain Regions: Across all three subjects, the frontal
+, parietal, and central lobes consistently showed a rich mix of dynamic states dominated by
+various frequencies like beta, gamma, and theta. This supports a "conductor-on-demand"
+model where these regions maintain a flexible toolkit for complex cognitive and motor tasks.
+
+
+Variability in Sensory and Global States: Significant differences were observed between
+subjects in sensory regions and at the global level.
+
+
+Occipital Lobe: Only Subject 1 showed the classic, powerful alpha-dominant resting state.
+Subjects 2 and 3 exhibited a mix of faster and slower frequencies, indicating that the occipital-alpha
+rhythm is a common but not universal default state.
+
+
+
+
+Temporal Lobe: The dominant states varied widely, from alpha in Subject 1 to gamma and 
+theta in Subjects 2 and 3, likely reflecting different internal cognitive states like inner monologue.
+
+
+
+Global State: Each subject presented a different global signature. Notably, only Subject 3 showed a 
+powerful, whole-brain alpha-dominant state, suggesting different individuals may use different
+frequency bands for large-scale integration during rest.
+
+In conclusion, the autoencoder successfully derived expected patterns like the Occipital-Alpha
+state  while also uncovering the complexity and significant inter-subject variability of brain 
+dynamics, advancing the model beyond a one-size-fits-all approach.
