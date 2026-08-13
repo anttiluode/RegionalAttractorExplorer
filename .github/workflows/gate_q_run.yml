@@ -1,0 +1,64 @@
+name: Gate Q external pilot
+
+on:
+  push:
+    paths:
+      - '.github/workflows/gate_q_run.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gate-q:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Environment
+        run: |
+          df -h
+          python --version
+          python -m pip install --quiet --upgrade pip
+          python -m pip install --quiet numpy scipy pandas scikit-learn mne awscli
+          python -m py_compile gate_q_external.py
+
+      - name: Fetch p17/p19 TS and phase-blind raw BrainVision data
+        run: |
+          mkdir -p gate_q_data
+          for s in p17 p19; do
+            for task in cl clcontrol; do
+              base="sub-${s}/ieeg/sub-${s}_task-${task}_ieeg"
+              for ext in vhdr vmrk eeg; do
+                echo "Fetching ${base}.${ext}"
+                aws s3 cp --no-sign-request "s3://openneuro.org/ds006065/${base}.${ext}" "gate_q_data/sub-${s}_task-${task}_ieeg.${ext}"
+              done
+            done
+          done
+          ls -lh gate_q_data
+          df -h
+
+      - name: Run frozen Gate Q
+        run: |
+          python gate_q_external.py
+
+      - name: Commit numeric receipt
+        if: success()
+        run: |
+          git config user.name 'gate-q-bot'
+          git config user.email 'gate-q-bot@users.noreply.github.com'
+          git add docs/GATE_Q_RESULT.md results/gate_q_result.json results/gate_q_metrics.csv
+          git commit -m 'Record frozen Gate Q p17 p19 result' || exit 0
+          git push
+
+      - name: Upload compact result artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-q-result
+          path: |
+            docs/GATE_Q_RESULT.md
+            results/gate_q_result.json
+            results/gate_q_metrics.csv
+          if-no-files-found: warn
