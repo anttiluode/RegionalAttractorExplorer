@@ -1,6 +1,6 @@
 # Gate Q result — p17/p19 external pilot
 
-**Verdict: `NO_QUERY_WINDOW_ADVANTAGE`**
+**Verdict: `EVENT_RECOVERY_FAILED`**
 
 This is a two-participant within-subject gate, not a population neuroscience claim.
 The gate was frozen before the raw response geometry was inspected.
@@ -9,8 +9,8 @@ The gate was frozen before the raw response geometry was inspected.
 
 | subject | TS pulses | PB pulses | TS pre-phase r | PB pre-phase r | recovery |
 |---|---:|---:|---:|---:|---|
-| p17 | 1007 | 1142 | 0.6372 | 0.0901 | True |
-| p19 | 523 | 589 | 0.7014 | 0.0422 | True |
+| p17 | 1007 | 1142 | 0.6526 | 0.1255 | True |
+| p19 | 523 | 589 | 0.0756 | 0.0889 | False |
 
 ## Primary late-window geometry (50-250 ms)
 
@@ -18,26 +18,26 @@ P-values are one-sided matched trial-label permutation p-values (64 permutations
 
 | subject | scale | Delta effective rank | p | Delta energy entropy | p | ridge CV acc |
 |---|---|---:|---:|---:|---:|---:|
-| p17 | raw | -19.3496 | 1.0000 | -0.047204 | 1.0000 | 0.6227 |
-| p17 | z | -31.9842 | 1.0000 | -0.062596 | 1.0000 | 0.6227 |
-| p19 | raw | 12.9863 | 0.0154 | 0.021662 | 0.0154 | 0.9981 |
-| p19 | z | 3.5005 | 0.1077 | 0.012052 | 0.0462 | 0.9981 |
+| p17 | raw | -43.0370 | 1.0000 | -0.060583 | 1.0000 | 0.7403 |
+| p17 | z | -50.5857 | 1.0000 | -0.091882 | 1.0000 | 0.7403 |
+| p19 | raw | 6.2132 | 0.0154 | -0.019024 | 1.0000 | 0.9962 |
+| p19 | z | 15.2327 | 0.0462 | 0.093782 | 0.0154 | 0.9962 |
 
 ## Negative-lag diagnostic (-250 to -50 ms)
 
 | subject | scale | Delta effective rank | p | Delta energy entropy | p |
 |---|---|---:|---:|---:|---:|
-| p17 | raw | -26.8475 | 1.0000 | -0.045590 | 1.0000 |
-| p17 | z | -48.1591 | 1.0000 | -0.078549 | 1.0000 |
-| p19 | raw | -0.2609 | 0.6615 | -0.006119 | 0.7846 |
-| p19 | z | -0.2503 | 0.5846 | -0.002120 | 0.7538 |
+| p17 | raw | -38.3042 | 1.0000 | -0.052830 | 1.0000 |
+| p17 | z | -61.8820 | 1.0000 | -0.097619 | 1.0000 |
+| p19 | raw | -1.6979 | 0.7692 | 0.003881 | 0.2462 |
+| p19 | z | -1.8582 | 0.8462 | 0.002093 | 0.2923 |
 
 ## Amplitude receipt
 
 | subject | median late RMS TS (uV) | median late RMS PB (uV) |
 |---|---:|---:|
-| p17 | 134.628 | 101.885 |
-| p19 | 361.564 | 438.887 |
+| p17 | 140.853 | 102.788 |
+| p19 | 300.910 | 421.229 |
 
 ## Interpretation rule
 
