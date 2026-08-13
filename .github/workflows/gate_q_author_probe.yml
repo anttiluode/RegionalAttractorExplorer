@@ -1,0 +1,65 @@
+name: Gate Q author preprocessing probe
+
+on:
+  push:
+    paths:
+      - '.github/workflows/gate_q_author_probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch authors analysis code
+        run: |
+          mkdir -p /tmp/gateq/tss
+          curl -L --fail --retry 3 -o /tmp/gateq/TSS-main.tar.gz 'https://zenodo.org/records/14735080/files/TSS-main.tar.gz?download=1'
+          tar -xzf /tmp/gateq/TSS-main.tar.gz -C /tmp/gateq/tss
+      - name: Extract preprocessing logic
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('/tmp/gateq/tss')
+          pats=['run_cl_ep_preproc','ft_redefinetrial','trl','findpeaks','artifact','pulse','trigger','threshold','diff(','stim_chan','is_stim','get_stim_info','read','load','ft_preprocessing','sampleinfo','trialinfo']
+          targets=[]
+          for p in root.rglob('*.m'):
+              txt=p.read_text(errors='replace')
+              if any(x.lower() in txt.lower() for x in pats):
+                  targets.append((p,txt))
+          lines=['# Gate Q authors-preprocessing probe','']
+          priority=('run_cl_ep_preproc.m','run_group_ged.m','run_group_cl_phase.m','get_stim_info.m')
+          for p,txt in sorted(targets, key=lambda z:(0 if z[0].name in priority else 1, str(z[0]))):
+              raw=txt.splitlines()
+              hits=[]
+              for i,line in enumerate(raw):
+                  if any(x.lower() in line.lower() for x in pats):
+                      hits.append(i)
+              if not hits: continue
+              keep=set()
+              for i in hits:
+                  keep.update(range(max(0,i-6),min(len(raw),i+8)))
+              if p.name in priority:
+                  keep.update(range(min(len(raw),220)))
+              lines += [f'## `{p.relative_to(root)}`','','```matlab']
+              prev=None
+              shown=0
+              for i in sorted(keep):
+                  if shown>=320: break
+                  if prev is not None and i>prev+1: lines.append('...')
+                  lines.append(f'{i+1:04d}: {raw[i]}')
+                  prev=i; shown+=1
+              lines += ['```','']
+          Path('docs/GATE_Q_AUTHOR_PREPROCESSING.md').write_text('\n'.join(lines),encoding='utf-8')
+          PY
+      - name: Commit report
+        run: |
+          git config user.name 'gate-q-bot'
+          git config user.email 'gate-q-bot@users.noreply.github.com'
+          git add docs/GATE_Q_AUTHOR_PREPROCESSING.md
+          git commit -m 'Record Gate Q author preprocessing probe' || exit 0
+          git push
