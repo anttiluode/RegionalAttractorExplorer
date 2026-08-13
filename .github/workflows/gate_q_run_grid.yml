@@ -1,0 +1,56 @@
+name: Gate Q external pilot v2 grid
+
+on:
+  push:
+    paths:
+      - '.github/workflows/gate_q_run_grid.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gate-q-grid:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - name: Environment
+        run: |
+          python -m pip install --quiet --upgrade pip
+          python -m pip install --quiet numpy scipy pandas scikit-learn mne awscli
+          python -m py_compile gate_q_external.py gate_q_external_grid.py
+      - name: Fetch p17/p19 public runs
+        run: |
+          mkdir -p gate_q_data
+          for s in p17 p19; do
+            for task in cl clcontrol; do
+              base="sub-${s}/ieeg/sub-${s}_task-${task}_ieeg"
+              for ext in vhdr vmrk eeg; do
+                aws s3 cp --no-sign-request "s3://openneuro.org/ds006065/${base}.${ext}" "gate_q_data/sub-${s}_task-${task}_ieeg.${ext}"
+              done
+            done
+          done
+      - name: Run unchanged Gate Q metrics on deterministic epoch grid
+        run: python gate_q_external_grid.py
+      - name: Commit v2 numeric receipt
+        if: success()
+        run: |
+          git config user.name 'gate-q-bot'
+          git config user.email 'gate-q-bot@users.noreply.github.com'
+          mkdir -p results/archive
+          git show HEAD:docs/GATE_Q_RESULT.md > results/archive/GATE_Q_RESULT_V1_ARTIFACT_RECOVERY.md || true
+          git add docs/GATE_Q_RESULT.md results/gate_q_result.json results/gate_q_metrics.csv results/archive/GATE_Q_RESULT_V1_ARTIFACT_RECOVERY.md
+          git commit -m 'Record Gate Q v2 deterministic epoch-grid result' || exit 0
+          git push
+      - name: Upload compact v2 result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-q-result-v2-grid
+          path: |
+            docs/GATE_Q_RESULT.md
+            results/gate_q_result.json
+            results/gate_q_metrics.csv
+            results/archive/GATE_Q_RESULT_V1_ARTIFACT_RECOVERY.md
+          if-no-files-found: warn
