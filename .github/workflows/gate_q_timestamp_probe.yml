@@ -1,0 +1,42 @@
+name: Gate Q timestamp probe
+
+on:
+  push:
+    paths:
+      - '.github/workflows/gate_q_timestamp_probe.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p /tmp/tss
+          curl -L --fail --retry 3 -o /tmp/tss.tar.gz 'https://zenodo.org/records/14735080/files/TSS-main.tar.gz?download=1'
+          tar -xzf /tmp/tss.tar.gz -C /tmp/tss
+      - run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('/tmp/tss')
+          wanted=['get_condition_info.m','get_epoched_eeg.m']
+          lines=['# Gate Q author timestamp/event logic','']
+          for name in wanted:
+              hits=list(root.rglob(name))
+              if not hits:
+                  lines += [f'## `{name}`','', '**NOT FOUND**','']; continue
+              p=hits[0]; txt=p.read_text(errors='replace')
+              lines += [f'## `{p.relative_to(root)}`','','```matlab']
+              for i,l in enumerate(txt.splitlines(),1): lines.append(f'{i:04d}: {l}')
+              lines += ['```','']
+          Path('docs/GATE_Q_AUTHOR_TIMESTAMPS.md').write_text('\n'.join(lines),encoding='utf-8')
+          PY
+      - run: |
+          git config user.name 'gate-q-bot'
+          git config user.email 'gate-q-bot@users.noreply.github.com'
+          git add docs/GATE_Q_AUTHOR_TIMESTAMPS.md
+          git commit -m 'Record Gate Q timestamp construction' || exit 0
+          git push
