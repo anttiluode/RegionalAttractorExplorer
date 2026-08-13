@@ -1,0 +1,41 @@
+name: Gate Q core trial-construction probe
+
+on:
+  push:
+    paths:
+      - '.github/workflows/gate_q_core_probe.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p /tmp/tss
+          curl -L --fail --retry 3 -o /tmp/tss.tar.gz 'https://zenodo.org/records/14735080/files/TSS-main.tar.gz?download=1'
+          tar -xzf /tmp/tss.tar.gz -C /tmp/tss
+      - run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('/tmp/tss')
+          wanted=['get_subj_eeg.m','run_cl_preproc.m','run_line_filter.m','get_phase_chan.m']
+          lines=['# Gate Q author core trial construction','']
+          for name in wanted:
+              hits=list(root.rglob(name))
+              if not hits: continue
+              p=hits[0]; txt=p.read_text(errors='replace')
+              lines += [f'## `{p.relative_to(root)}`','','```matlab']
+              for i,l in enumerate(txt.splitlines(),1): lines.append(f'{i:04d}: {l}')
+              lines += ['```','']
+          Path('docs/GATE_Q_AUTHOR_CORE.md').write_text('\n'.join(lines),encoding='utf-8')
+          PY
+      - run: |
+          git config user.name 'gate-q-bot'
+          git config user.email 'gate-q-bot@users.noreply.github.com'
+          git add docs/GATE_Q_AUTHOR_CORE.md
+          git commit -m 'Record Gate Q author trial construction' || exit 0
+          git push
