@@ -1,0 +1,33 @@
+{
+  "schema": "regional-attractor-explorer/pilot-field-cohort-summary-v1",
+  "cohort": "healthy",
+  "n_subjects": 14,
+  "settings": {
+    "duration_s": 60.0,
+    "phase_band": [8.0, 12.0],
+    "fast_band": [30.0, 45.0],
+    "lag_ms": 80.0,
+    "surrogates": 200
+  },
+  "guidance_alignment": {
+    "mean": 0.0018719507141756865,
+    "median": -0.00021384954372671592,
+    "n_positive": 7,
+    "n_nominal_p_lt_0_05": 1
+  },
+  "guidance_predictive_gain": {
+    "mean": -0.0023713880318510304,
+    "median": -0.002134994175555886,
+    "n_positive": 3,
+    "n_negative": 11
+  },
+  "writeback_predictive_gain": {
+    "mean": -0.035280055039365106,
+    "median": -0.0032012808558775007,
+    "n_positive": 0,
+    "n_negative": 14,
+    "warning": "h14.edf produced -0.4524100185; writeback is descriptive only in the frozen patient-control group gate"
+  },
+  "p1_subjects_passing_both_alignment_and_predictive_gain": 0,
+  "classification": "P1_HEALTHY_14_SUBJECT_REPLICATION_NULL"
+}
