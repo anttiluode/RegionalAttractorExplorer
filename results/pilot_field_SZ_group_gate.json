@@ -1,0 +1,25 @@
+{
+  "schema": "regional-attractor-explorer/pilot-field-group-gate-v1",
+  "frozen_before_schizophrenia_results": true,
+  "healthy_receipt": "E:\\DocsHouse\\950\\RegionalAttractorExplorer\\results\\pilot_field_SZ_healthy_batch.json",
+  "schizophrenia_receipt": "E:\\DocsHouse\\950\\RegionalAttractorExplorer\\results\\pilot_field_SZ_schizophrenia_batch.json",
+  "primary_endpoint": "guidance_predictive_gain",
+  "primary_test": "two-sided subject-label permutation test of mean difference",
+  "healthy": {
+    "guidance_predictive_gain": {"n": 14, "mean": -0.0023713880318510304, "median": -0.002134994175555886, "sd": 0.0038270260925920303, "min": -0.009293177333774667, "max": 0.00496135135753136, "n_positive": 3, "n_negative": 11},
+    "guidance_alignment": {"n": 14, "mean": 0.0018719507141756865, "median": -0.00021384954372671592, "sd": 0.014495042103827781, "min": -0.025453714227527385, "max": 0.025705999519726592, "n_positive": 7, "n_negative": 7},
+    "writeback_predictive_gain": {"n": 14, "mean": -0.035280055039365106, "median": -0.0032012808558775007, "sd": 0.12007667211046502, "min": -0.4524100185449145, "max": -0.00043446540122593733, "n_positive": 0, "n_negative": 14},
+    "phase_fit_coherence_mean": {"n": 14, "mean": 0.5373437213476274, "median": 0.5462240336578869, "sd": 0.06874896531816793, "min": 0.4100553672711557, "max": 0.6343139664087234, "n_positive": 14, "n_negative": 0}
+  },
+  "schizophrenia": {
+    "guidance_predictive_gain": {"n": 14, "mean": -0.0028555734533957, "median": -0.002432456686794057, "sd": 0.002271713617249502, "min": -0.006338044233349016, "max": -0.00022974996615049515, "n_positive": 0, "n_negative": 14},
+    "guidance_alignment": {"n": 14, "mean": -0.0002488739842464767, "median": -0.0023750564007881465, "sd": 0.011953541597428015, "min": -0.017482843349988023, "max": 0.023477855979562035, "n_positive": 6, "n_negative": 8},
+    "writeback_predictive_gain": {"n": 14, "mean": -0.3659452958172361, "median": -0.0037375086547770083, "sd": 1.3564995767075012, "min": -5.078956536512029, "max": 0.0009224088517117018, "n_positive": 1, "n_negative": 13},
+    "phase_fit_coherence_mean": {"n": 14, "mean": 0.5589010636776689, "median": 0.5749632553738073, "sd": 0.053427299438100866, "min": 0.4623923112877997, "max": 0.6341039237934659, "n_positive": 14, "n_negative": 0}
+  },
+  "primary_group_test": {"difference_second_minus_first": -0.00048418542154466965, "p_two_sided": 0.6883531164688353, "n_permutations": 100000, "seed": 20260906},
+  "secondary_alignment_test": {"difference_second_minus_first": -0.0021208246984221633, "p_two_sided": 0.6750832491675083, "n_permutations": 100000, "seed": 20260907},
+  "writeback_policy": "descriptive only in this gate; healthy h14 produced a large negative outlier before the schizophrenia cohort was inspected",
+  "verdict": "NO_GROUP_DIFFERENCE_IN_P1_PREDICTIVE_GAIN",
+  "interpretation_boundary": "A group difference is a difference in this sensor-space predictive screening metric only. It does not establish causal wave guidance, a disease mechanism, or a quantum-brain claim."
+}
