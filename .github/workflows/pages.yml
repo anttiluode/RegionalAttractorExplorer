@@ -1,13 +1,9 @@
 name: pages
 
+# GitHub Pages must be enabled once in repository Settings before this workflow
+# can deploy. The connected GitHub integration has repo-content permissions but
+# not the administration permission required to create the Pages site.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'docs/**'
-      - 'index.html'
-      - 'README.md'
-      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -28,8 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs
