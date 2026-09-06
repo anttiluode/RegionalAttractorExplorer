@@ -1,304 +1,154 @@
-![Regional Attractor Explorer](image.png)
-
-EDIT: The 3d system readme is after this one. 
-
-EDIT: Added AI Autoencoder signal analysis tool that suggests thre are multiple 
-conductors and results vary between subjects. The results are analyzed by Gemini at the end of 
-the readme. 
-
 # Regional Attractor Explorer
 
-Watch brain regions trace their own “state-space” loops.
+## 2026 reset: keep the instrument, kill the story
 
-This tool builds a 3D attractor per cortical region from ordinary EEG data. The attractor is defined by three orthogonal dimensions 
-derived from the signal, revealing the dynamic interplay of neural oscillations.
+This repository started as an EEG visualization experiment around regional alpha power, multi-band composites and 3-D state-space trajectories. An old AI-written branch then inflated that into a **"Universal Brain Coordination Model"** with a conductor/orchestra story.
 
--   **X**: Regional MNE alpha power (8–13 Hz)
--   **Y**: Regional Moiré composite (a multi-band, band-weighted root mean square)
--   **Z**: The phase relationship between the two (e.g., Phase Slip Rate, Phase Difference, etc.)
--   **Color**: An optional synchrony metric (e.g., Phase-Locking Value)
+That strong story is not supported. Worse: one historical coordination metric was algebraically broken.
 
-It lets you click cortical regions (frontal, temporal, parietal, occipital, midline), tune band weights, and watch repeatable coordination
-motifs emerge: bursts, brief phase-locks, slips, and re-locks—which are especially vivid in occipital alpha rhythms.
+The repo now treats its history as an audit trail and asks smaller questions that can fail.
 
----
+**Live site:** https://anttiluode.github.io/RegionalAttractorExplorer/
 
-## ✨ Features
+## What died
 
--   **Interactive region selector**: Click dots on the scalp map to switch between brain regions.
--   **Persistent 3D attractor**: The trajectory's tail persists over time and does not auto-clear, allowing you to see the full evolution of the state-space dynamics.
--   **Multiple Z/Color modes**: Choose from PhaseSlipRate, PhaseDiff, DelayDiff, PLV, and VelocityMag to explore different aspects of the signal relationship.
--   **Live band weight tuning**: Adjust per-band weights (δ, θ, α, β, γ) with sliders and see the attractor update in real-time.
--   **Analysis controls**: Fine-tune the analysis window, hop length, and display smoothing.
--   **Playback controls**: Play, pause, and clear the attractor visualization.
--   **Clean UI**: A dark, minimalist interface with a separate control pane keeps the 3D visualization large and centered.
+The historical source-space code computed
 
----
+```python
+plv_instantaneous = np.abs(np.exp(1j * (phase_conductor - phase_moire)))
+```
 
-## 🚀 Quick start
+but
 
-1.  **Set up the environment** (Python ≥3.9 recommended):
-    ```bash
-    python -m venv .venv
-    # On macOS/Linux
-    . .venv/bin/activate
-    # On Windows
-    .venv\Scripts\activate
-    ```
+```text
+|exp(i theta)| = 1
+```
 
-2.  **Install dependencies**: `tkinter` is included with most Python distributions on Windows/macOS. On some Linux distros,
-3.   you may need to install it separately (e.g., `sudo apt-get install python3-tk`).
-    ```bash
-    pip install -U mne numpy scipy matplotlib
-    ```
+for every phase angle. Therefore the old pointwise "PLV" contained no phase-locking information, its phase-slip value collapsed to zero, and `Y*PLV` collapsed to `Y`.
 
-4.  **Run the application**:
-    ```bash
-    python regional_attractor_explorer.py
-    ```
+A second bug built the "orchestra" by filtering continuously from the minimum selected frequency to the maximum selected frequency. With alpha excluded as the candidate conductor, that broad filter could simply include alpha again.
 
-5.  **Explore**: Load an EEG file (.edf, .bdf, .vhdr, .set, .fif), click **Play**, then click a region on the scalp map.
+**Old coordination screenshots are provenance, not evidence.** See [`docs/CONDUCTOR_AUDIT_2026.md`](docs/CONDUCTOR_AUDIT_2026.md).
 
-> **Tip**: Try **Occipital** regions first and toggle **Z = PhaseSlipRate** or **PhaseDiff**, and **Color = PLV**.
+## What survived
 
----
+Three things remain useful:
 
-## 🧠 How it works (signal recipe)
+1. **RegionalAttractorExplorer itself** is still a visualization tool for ordinary EEG-derived features. A trajectory in a chosen feature space can be useful without being a literal neural attractor.
+2. [`conductor_metrics.py`](conductor_metrics.py) and [`mnebrain_conductor_pac.py`](mnebrain_conductor_pac.py) repair the old algebra with conventional windowed phase-amplitude coupling (PAC). PAC is association, not causal control.
+3. The repository already made external contact with a stronger hypothesis. The preregistered phase-timed iEEG **Gate Q** returned **`NO_QUERY_WINDOW_ADVANTAGE`** for the claim that theta-synchronized stimulation expands future response dimensionality. That null stays. See [`docs/HANDOFF_2026.md`](docs/HANDOFF_2026.md).
 
-Per analysis window (e.g., 1000 ms; hop 40 ms), the script calculates the following for the selected region *R*:
+## New branch: the pilot-field audit
 
-### X — MNE alpha power (scalar)
+"Pilot field" is a computational nickname, **not a de Broglie-Bohm or quantum-brain claim**.
 
-The **X-axis** represents the average alpha power. It's calculated by taking the Welch PSD for each channel in the region,
-averaging the power in the alpha band (8–13 Hz), and then averaging this value across all channels in the region.
+The question is now spatial and predictive:
 
-$X = \frac{1}{|R|}\sum_{c\in R}\;\frac{1}{|F_\alpha|}\sum_{f\in F_\alpha} P_c(f)$
+> **Does the phase geometry of a slow oscillation contain information about where faster activity moves next?**
 
-A regional alpha time series is also constructed for phase analysis:
+and separately:
 
-$x_\alpha(t)=\frac{1}{|R|}\sum_{c\in R} \text{BPF}_{8–13}\{x_c(t)\}$
+> **Does the current fast-activity pattern contain information about how the slow phase field changes next?**
 
-### Y — Moiré composite (scalar)
+Human theta/alpha traveling waves are a real empirical phenomenon, and recent work links wave direction to behavior. That makes the geometry worth measuring. It does not make alpha a master conductor.
 
-The **Y-axis** is a "Moiré composite" that rises when multi-band activity in the region becomes coherent and interferes constructively.
-For each band $b\in\{\delta,\theta,\alpha,\beta,\gamma\}$ with a user-defined weight $w_b$:
+### P0 — known-answer test
 
-1.  The regional signal is band-passed, and channels are averaged to create a band-specific time series, $s_b(t)$.
-2.  Within the analysis window, $s_b(t)$ is z-normalized: $\tilde{s}_b(t)=(s_b-\mu_b)/\sigma_b$.
-3.  A composite signal $c(t)$ is formed by the weighted sum across bands: $c(t)=\sum_b w_b \tilde{s}_b(t)$.
-4.  The final **Y** value is the root mean square (RMS) of this composite signal within the window:
+[`pilot_field_metrics.py`](pilot_field_metrics.py) estimates a slow-wave spatial phase gradient from neighboring positioned sensors and turns `-grad(phi)` into a propagation-direction proxy. [`tests/test_pilot_field_metrics.py`](tests/test_pilot_field_metrics.py) checks that it recovers a known synthetic traveling wave and that a synthetically guided activity packet beats circular-shift pairings.
 
-    $Y = \sqrt{\tfrac{1}{N}\sum_t c(t)^2}$
+```bash
+python -m pytest -q tests/test_pilot_field_metrics.py
+```
 
-### Z / Color — phase & timing between $x_\alpha(t)$ and $c(t)$
+P0 validates the meter only.
 
-The **Z-axis** and **Color** map a timing or phase relationship between the alpha time series ($x_\alpha(t)$) and the Moiré composite ($c(t)$).
-Let $\phi_\alpha$ and $\phi_c$ be their instantaneous phases (via the Hilbert transform) and $\Delta\phi = \phi_\alpha - \phi_c$.
+### P1 — slow field -> future fast trajectory
 
--   **PhaseDiff** (rad): The circular mean of $\Delta\phi$.
--   **PhaseSlipRate** (rad/s): The mean derivative of the unwrapped phase difference, $\Delta\phi$.
--   **PLV** (0–1): The Phase-Locking Value, a measure of synchrony: $|\tfrac{1}{N}\sum e^{i\Delta\phi}|$.
--   **DelayDiff** (s): The time lag that maximizes the short-window cross-correlation between the two signals.
+[`pilot_field_explorer.py`](pilot_field_explorer.py) loads an EEG file and performs a conservative sensor-space screen:
 
-The final 3D curve is the trajectory of **(X, Y, Z)** points over time, with each segment colored by the chosen metric.
+```text
+slow band (default 8-12 Hz)
+        ↓ analytic phase
+spatial phase gradient across neighboring sensors
+        ↓
+phase-flow direction proxy
+        ↓
+compare with future displacement of fast-band amplitude centroid
+        ↓
+circular-shift null + blocked-CV predictive gain
+```
 
----
+Run:
 
-## 🕹️ Controls
+```bash
+python pilot_field_explorer.py recording.edf --start 0 --duration 60
+```
 
--   **File**: `Load EEG`, `Play`, `Pause`, `Clear`.
--   **Modes**:
-    -   `Z-axis mode`: Selects the metric for the vertical axis.
-    -   `Color mode`: Selects the metric for coloring the trajectory.
--   **Analysis**:
-    -   `Window (ms)`: Length of the analysis window (e.g., 750–1200).
-    -   `Hop (ms)`: Step size between windows (e.g., 25–50).
-    -   `Smoothing (points)`: Number of points for display smoothing (visual only).
--   **GFC Band Weights**: Sliders for δ, θ, α, β, γ weights (e.g., a good starting point is θ≈0.2, α≈1.0, β≈0.1).
--   **Region Selector**: Click the colored dots on the scalp map to select a region. A legend shows the region names.
+The default fast band is 30-45 Hz and the default future lag is 80 ms. Those defaults are hypotheses, not optimized findings.
 
----
+A useful P1 result should show both:
 
-## 🧪 Suggested demos
+- alignment stronger than prespecified large circular time shifts; and
+- held-out prediction improvement when slow-wave direction is added to a baseline containing current fast trajectory dynamics.
 
--   **Occipital (eyes relaxed/closed)**: Set `Z = PhaseSlipRate` and `Color = PLV`. Watch the classic "lock → slip → re-lock" cycles.
--   **Temporal**: Investigate the influence of muscle artifacts (EMG) by lowering the β and γ weights and observing the change in the attractor.
--   **Lead/Lag**: Set `Z = DelayDiff` to visualize which signal (alpha or the composite) is leading or lagging the other.
+### P2 — fast pattern -> future slow-field change
 
----
+The same run reports `writeback_predictive_gain`:
 
-## 📂 Supported file types
+```text
+baseline: current slow flow -> future slow flow
+enhanced: baseline + current fast centroid + fast global amplitude
+```
 
-The application uses MNE-Python for file loading and supports numerous formats, including:
+Positive gain means incremental predictive information. It **does not** establish that the fast activity physically writes the slow field.
 
--   BrainVision (.vhdr)
--   EDF/BDF (.edf, .bdf)
--   EEGLAB (.set)
--   FIF (.fif)
+See [`docs/PILOT_FIELD_2026.md`](docs/PILOT_FIELD_2026.md).
 
-By default, an average reference is applied, and the data is band-pass filtered between 1–50 Hz.
+## The hard EEG boundary
 
----
+A sensor-space traveling-wave result can be convincing and still be an artifact of reference choice, volume conduction, source mixing, spatial sampling, filtering or waveform shape. Scalp beta/gamma is also vulnerable to EMG.
 
-## ⚠️ Channel locations / montage
+So the stop rule is explicit:
 
-If you see a warning like `DigMontage is only a subset…`, it means some channel names in your file did not match the standard montage used by the application (e.g., your file has `Fp1` but the montage expects `FP1`).
+> Do not rescue a null by searching bands, regions, lags, references, source models or smoothing choices until something becomes significant.
 
--   **Why it matters**: If channels are dropped, comparisons between regions can be biased because some regions will be defined by fewer channels than others.
--   **Fixes**:
-    1.  Ensure channel names in your data file match a standard montage (typically uppercase, with no special characters like dots).
-    2.  Use a standard MNE montage (like `standard_1005`) when setting up your data to ensure names align.
-    3.  You can optionally modify the code to print the count of "channels per region" to the status bar to verify correct channel mapping.
+Freeze the measurement first. Replicate second. Interpret last.
 
----
+## Recent empirical anchors
 
-## 🛠️ Requirements
+- Mohan et al., *Nature Human Behaviour* (2024), **The direction of theta and alpha travelling waves modulates human memory processing**: https://doi.org/10.1038/s41562-024-01838-3
+- Koller et al., *Nature Communications* (2024), **Human connectome topology directs cortical traveling waves and shapes frequency gradients**: https://doi.org/10.1038/s41467-024-47860-x
+- Model-based MEG/EEG traveling-wave recovery in human visual cortex (2025): https://pubmed.ncbi.nlm.nih.gov/40245091/
+- Traveling waves linking visual and frontal cortex during memory-guided behavior (2025): https://pubmed.ncbi.nlm.nih.gov/40699921/
+- Kragel et al., *Nature Communications* (2025), closed-loop theta stimulation used by this repo's Gate Q: https://doi.org/10.1038/s41467-025-59417-7
 
--   Python 3.9+
--   mne, numpy, scipy, matplotlib
--   tkinter (usually bundled with Python; on some Linux distributions, install with `sudo apt-get install python3-tk`)
+## Historical tools kept on purpose
 
-# 🔍 Interpretation tips
-Filaments/sheets: Structured shapes like filaments and sheets in the 3D plot suggest structured coordination, not just random noise.
+- `regional_attractor_explorer.py` — original regional 3-D feature explorer.
+- `mnebrain_signalvs_composite3.py` — historical source-space branch; **do not use its old pointwise PLV as evidence**.
+- `AI_brainstate_analyzer.py`, `ai_autoencoder_signal_analysis.py`, `gamma_gating_explorer_for_temporal_lobes.py` — exploratory historical branches. Their prose conclusions are hypotheses/provenance unless separately audited.
+- `mnebrain_conductor_pac.py` — repaired PAC association screen.
+- `gate_q_external.py`, `gate_q_external_grid.py` — frozen external Gate Q analysis and event-coordinate correction.
 
-High PLV segments: Brightly colored segments (when Color = PLV) on the trajectory indicate moments of transient phase-locking.
+## Install
 
-Sharp Z excursions: Sudden spikes on the Z-axis (when Z = PhaseSlipRate), especially near Y-axis peaks, can signify phase slips occurring during Moiré "bursts".
+```bash
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# macOS/Linux
+# source .venv/bin/activate
 
-Temporal β/γ influence: Up-down movement in temporal regions that correlates with high β/γ weights is often due to muscle (EMG) artifacts. Test this by lowering the β/γ weights.
+pip install -r requirements.txt
+```
 
-# Licence MIT 
+For only the synthetic pilot-field tests:
 
-## Readme for MNEBRAIN Signal VS compsite (based on the first code)
+```bash
+pip install numpy scipy pytest
+python -m pytest -q tests/test_pilot_field_metrics.py
+```
 
-![image2](image2.png)
+## License
 
-(Claude may have hyped it up a "bit") 
-
-# EEG Brain Source & Coordination Explorer
-
-Revolutionary Neural Coordination Analysis Tool
-This system implements the Universal Brain Coordination Model, a groundbreaking framework for understanding how
-different brain frequency bands coordinate neural activity in real-time. Moving beyond traditional power spectral
-analysis, this tool reveals the hidden dynamics of neural coordination through advanced source reconstruction and
-cross-frequency coupling analysis.
-
-# 🧠 Core Innovation: Coordinated Power Metric
-
-The system introduces a novel neuroimaging metric: Coordinated Power (Y×PLV)
-
-Y: Multi-band neural activity power (moiré composite of delta, theta, beta, gamma)
-PLV: Phase-Locking Value measuring coordination strength between conductor and orchestra
-Y×PLV: Reveals where and when frequency bands successfully coordinate
-
-This metric captures something entirely new: neural harmony - the precise moments when a conductor frequency (e.g., alpha) successfully orchestrates multi-band neural activity across the brain.
-
-# 🎼 The Universal Brain Coordination Model
-
-Key Concepts:
-
-Conductor Frequencies: Primary rhythms that coordinate neural activity (alpha for vision, gamma for language)
-Neural Orchestra: Multi-band composite signals that respond to conductor coordination
-Phase-Slip Dynamics: Real-time coordination failures and recoveries
-3D Neural Trajectories: Geometric visualization of coordination patterns in brain space
-
-# 🔬 Technical Features
-
-Advanced Source Reconstruction:
-
-Multiple inverse methods (sLORETA, dSPM, MNE, eLORETA)
-3-layer BEM modeling for accurate EEG source localization
-Automated fsaverage brain template integration
-
-# Coordination Analysis Pipeline:
-
-Broadband source reconstruction with frequency-specific filtering
-Hilbert transform phase extraction for conductor and orchestra signals
-Real-time Phase-Locking Value calculation
-Time-resolved coordination mapping
-
-# Interactive Visualization:
-
-Real-time 3D brain visualization with MNE-Python
-Multiple coordination metrics (Conductor Power, Moiré Harmony, Phase-Slip Rate, Coordinated Power)
-Dynamic time-course analysis with coordinated hotspot identification
-
-# Research Applications:
-
-Neural Coordination Biomarkers: Identify coordination disruptions in neurological conditions
-Cognitive State Monitoring: Real-time tracking of attention, language, and memory coordination
-Brain-Computer Interfaces: Leverage coordination patterns for enhanced neural control
-
-Clinical Potential:
-
-Consciousness Assessment: Coordination complexity as consciousness biomarker
-Stroke Rehabilitation: Target coordination recovery in specific brain regions
-ADHD/Autism Research: Investigate coordination differences in neurodevelopmental conditions
-
-# 🚀 Getting Started
-
-Requirements:
-
-Python 3.8+
-MNE-Python for EEG processing
-PyVista/PyVistaQt for 3D visualization
-Standard scientific Python stack (NumPy, SciPy, Matplotlib)
-
-# Quick Start:
-
-Download the mnebrain_signalvs_composite3.py
-
-Then download the requirements.txt 
-
-install the requirements: 
-
-pip install requirements.txt 
-
-run the code. 
-
-python mnebrain_signalvs_composite3.py
-
-Load EEG file (supports .edf, .bdf, .fif, .set formats)
-Select coordination model settings (conductor frequency, orchestra composition)
-Run processing pipeline for automatic source reconstruction and coordination analysis
-Explore real-time 3D brain coordination visualizations
-
-# Licence MIT
-
-# AI Autoencoder results: 
-
-The autoencoder analysis revealed that brain activity is organized into a flexible repertoire
-of distinct states rather than being governed by a single, fixed "conductor" frequency in each
-region. This data-driven approach provided a more nuanced view than previous methods.
-
-Key Findings
-
-Consistent Flexibility in Higher-Order Brain Regions: Across all three subjects, the frontal
-, parietal, and central lobes consistently showed a rich mix of dynamic states dominated by
-various frequencies like beta, gamma, and theta. This supports a "conductor-on-demand"
-model where these regions maintain a flexible toolkit for complex cognitive and motor tasks.
-
-
-Variability in Sensory and Global States: Significant differences were observed between
-subjects in sensory regions and at the global level.
-
-
-Occipital Lobe: Only Subject 1 showed the classic, powerful alpha-dominant resting state.
-Subjects 2 and 3 exhibited a mix of faster and slower frequencies, indicating that the occipital-alpha
-rhythm is a common but not universal default state.
-
-
-
-
-Temporal Lobe: The dominant states varied widely, from alpha in Subject 1 to gamma and 
-theta in Subjects 2 and 3, likely reflecting different internal cognitive states like inner monologue.
-
-
-
-Global State: Each subject presented a different global signature. Notably, only Subject 3 showed a 
-powerful, whole-brain alpha-dominant state, suggesting different individuals may use different
-frequency bands for large-scale integration during rest.
-
-In conclusion, the autoencoder successfully derived expected patterns like the Occipital-Alpha
-state  while also uncovering the complexity and significant inter-subject variability of brain 
-dynamics, advancing the model beyond a one-size-fits-all approach.
+MIT.
