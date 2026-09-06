@@ -1,0 +1,42 @@
+{
+  "schema": "regional-attractor-explorer/pilot-field-cohort-summary-v1",
+  "cohort": "schizophrenia",
+  "n_subjects": 14,
+  "settings": {
+    "start_s": 0.0,
+    "duration_s": 60.0,
+    "phase_band": [8.0, 12.0],
+    "fast_band": [30.0, 45.0],
+    "lag_ms": 80.0,
+    "surrogates": 200,
+    "seed": 0,
+    "event_conditioning": false
+  },
+  "guidance_alignment": {
+    "mean": -0.00024887398424647625,
+    "median": -0.0023750564007881465,
+    "n_positive": 6,
+    "n_negative": 8,
+    "min": -0.017482843349988023,
+    "max": 0.023477855979562035
+  },
+  "guidance_predictive_gain": {
+    "mean": -0.0028555734533957005,
+    "median": -0.002432456686794057,
+    "n_positive": 0,
+    "n_negative": 14,
+    "min": -0.006338044233349016,
+    "max": -0.00022974996615049515
+  },
+  "writeback_predictive_gain": {
+    "mean": -0.3659452958172361,
+    "median": -0.0037375086547770083,
+    "n_positive": 1,
+    "n_negative": 13,
+    "min": -5.078956536512029,
+    "max": 0.0009224088517117018
+  },
+  "p1_subjects_passing_both_alignment_and_predictive_gain": 0,
+  "classification": "P1_SCHIZOPHRENIA_14_SUBJECT_REPLICATION_NULL",
+  "writeback_warning": "s07.edf produced -5.0789565365; current writeback relative-gain score is numerically unstable and remains descriptive only"
+}
