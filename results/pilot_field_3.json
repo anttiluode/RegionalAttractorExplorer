@@ -1,0 +1,17 @@
+{
+  "n_channels": 64,
+  "n_samples": 9601,
+  "sfreq": 160.0,
+  "phase_band": [8.0, 12.0],
+  "fast_band": [30.0, 45.0],
+  "lag_ms": 80.0,
+  "phase_fit_coherence_mean": 0.4979692514141618,
+  "guidance_alignment": -0.020671271122678914,
+  "guidance_n": 7191,
+  "guidance_null_p": 0.9054726368159204,
+  "guidance_null_z": -1.3733221694556665,
+  "guidance_predictive_gain": -0.0013628141572537484,
+  "writeback_predictive_gain": -0.0024916391407464474,
+  "file": "3.edf",
+  "warning": "Sensor-space traveling-wave geometry is a screening measurement. Volume conduction, reference choice, source mixing, filtering, waveform shape, EMG and other artifacts can create apparent phase gradients or cross-frequency structure."
+}
