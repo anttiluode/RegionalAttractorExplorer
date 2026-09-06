@@ -104,6 +104,19 @@ Positive gain means incremental predictive information. It **does not** establis
 
 See [`docs/PILOT_FIELD_2026.md`](docs/PILOT_FIELD_2026.md).
 
+## First real EEG receipt: null on two recordings
+
+Two independent 60-second, 64-channel recordings have now been run through the frozen first-pass settings (`8-12 Hz -> 30-45 Hz`, `80 ms` lag):
+
+| file | phase-fit coherence | guidance alignment | shift-null p | guidance predictive gain | writeback gain |
+|---|---:|---:|---:|---:|---:|
+| `2.edf` | 0.4846 | +0.00583 | 0.3781 | -0.00494 | +0.00094 |
+| `3.edf` | 0.4980 | -0.02067 | 0.9055 | -0.00136 | -0.00249 |
+
+**Classification: `P1_FIRST_TWO_RECORDINGS_NULL`.** The slow-field direction did not beat time-shifted pairings and did not improve held-out prediction of future fast-centroid motion in either recording. P2 likewise has no convincing evidence yet.
+
+See [`docs/PILOT_FIELD_FIRST_REAL_DATA.md`](docs/PILOT_FIELD_FIRST_REAL_DATA.md) and the raw receipts in [`results/pilot_field_2.json`](results/pilot_field_2.json) and [`results/pilot_field_3.json`](results/pilot_field_3.json).
+
 ## The hard EEG boundary
 
 A sensor-space traveling-wave result can be convincing and still be an artifact of reference choice, volume conduction, source mixing, spatial sampling, filtering or waveform shape. Scalp beta/gamma is also vulnerable to EMG.
