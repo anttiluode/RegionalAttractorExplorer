@@ -26,22 +26,20 @@ A second bug built the "orchestra" by filtering continuously from the minimum se
 
 ## What survived
 
-- `regional_attractor_explorer.py` remains a useful feature-space visualization tool. A trajectory can be useful without being a literal neural attractor.
+- `regional_attractor_explorer.py` remains a feature-space visualization tool. A trajectory can be useful without being a literal neural attractor.
 - `conductor_metrics.py` / `mnebrain_conductor_pac.py` repair the old algebra with conventional windowed PAC. PAC is association, not causal control.
-- The external phase-timed iEEG Gate Q returned **`NO_QUERY_WINDOW_ADVANTAGE`** for the stronger claim that theta-synchronized stimulation expands future response dimensionality. That null stays.
-- Spatial traveling-wave geometry is a legitimate measurement target, so the repo now tests it directly and predictively.
+- Spatial traveling-wave geometry is a legitimate measurement target.
+- The useful habit that survived everything else is **gates, receipts, nulls and stop rules**.
 
 ## Pilot-field audit
 
 "Pilot field" is a computational nickname, **not a de Broglie-Bohm or quantum-brain claim**.
 
-The questions are:
+The first-pass question was deliberately simple:
 
-> **P1:** Does the phase geometry of a slow oscillation contain information about where faster activity moves next?
+> Does the phase geometry of a slow oscillation contain information about where faster activity moves next?
 
-> **P2:** Does the current fast-activity pattern contain information about how the slow phase field changes next?
-
-The frozen first-pass P1 screen is:
+The frozen P1 screen was:
 
 ```text
 8-12 Hz analytic phase
@@ -67,9 +65,9 @@ Run a cohort:
 python pilot_field_batch.py "*.edf" --start 0 --duration 60 --out results/pilot_field_batch.json
 ```
 
-The primary logic was fixed before real-data replication: a useful P1 result should show both a shift-null alignment advantage **and** positive held-out predictive gain.
+A useful P1 result was required to show both a shift-null alignment advantage **and** positive held-out predictive gain.
 
-## Current receipts
+## Negative-result wall
 
 | Gate / dataset | Result |
 |---|---|
@@ -80,57 +78,57 @@ The primary logic was fixed before real-data replication: a useful P1 result sho
 | First two 64-channel EEG recordings | **`P1_FIRST_TWO_RECORDINGS_NULL`** |
 | PhysioNet S016, 14 repeated runs from one person | **`P1_S016_WHOLE_RUN_NULL`** |
 | Healthy cohort, 14 separate subjects | **`P1_HEALTHY_14_SUBJECT_REPLICATION_NULL`** |
-| S016 event-conditioned task-vs-rest gate | open / separately frozen |
-| Healthy-vs-schizophrenia subject-level group gate | open / frozen before patient results |
+| Schizophrenia cohort, 14 separate subjects | **`P1_SCHIZOPHRENIA_14_SUBJECT_REPLICATION_NULL`** |
+| Healthy vs schizophrenia frozen group gate | **`NO_GROUP_DIFFERENCE_IN_P1_PREDICTIVE_GAIN`** |
+| P2 writeback score | **`P2_WRITEBACK_ESTIMATOR_UNSTABLE`** |
+| S016 event-conditioned task-vs-rest gate | **OPEN — separately frozen** |
 
-### Healthy 14-subject replication
+The simple whole-run passive P1 mapping has therefore been repeatedly rejected. That does **not** mean traveling waves are absent. It means this specific sensor-space mapping has not earned support:
 
-Frozen settings were unchanged: first 60 s, 8–12 Hz phase field, 30–45 Hz fast field, 80 ms lag.
+> **8–12 Hz phase-flow → future 30–45 Hz amplitude-centroid motion at 80 ms.**
 
-- mean guidance alignment: `+0.001872`
-- median guidance alignment: `-0.000214`
-- positive alignments: `7 / 14`
-- nominal alignment `p < .05`: `1 / 14`
-- mean guidance predictive gain: `-0.002371`
-- median guidance predictive gain: `-0.002135`
-- positive predictive gain: `3 / 14`
-- subjects satisfying both intended P1 requirements: **`0 / 14`**
+## 28-subject frozen patient-control gate
 
-The one nominal alignment hit (`h10`, `p=0.0348`) had **negative** held-out predictive gain, so it does not pass P1.
+The patient-control statistic was frozen before the schizophrenia cohort was inspected.
 
-See [`docs/PILOT_FIELD_HEALTHY_COHORT.md`](docs/PILOT_FIELD_HEALTHY_COHORT.md) and [`results/pilot_field_SZ_healthy_summary.json`](results/pilot_field_SZ_healthy_summary.json).
+Primary endpoint: subject-level `guidance_predictive_gain`.
 
-## Frozen patient-control gate
+Primary test: two-sided subject-label permutation test, 100,000 permutations.
 
-The schizophrenia files have not yet been used to choose the group statistic. The group comparison is now frozen in [`pilot_field_group_gate.py`](pilot_field_group_gate.py):
+| endpoint | healthy (n=14) | schizophrenia (n=14) | SZ − H | p |
+|---|---:|---:|---:|---:|
+| guidance predictive gain | -0.002371 | -0.002856 | -0.000484 | **0.6884** |
+| guidance alignment | +0.001872 | -0.000249 | -0.002121 | **0.6751** |
 
-- **primary:** subject-level `guidance_predictive_gain`
-- **test:** two-sided subject-label permutation test
-- **secondary:** `guidance_alignment`
-- **writeback:** descriptive only in this gate
+Healthy predictive gain was negative in 11/14 subjects. Schizophrenia predictive gain was negative in 14/14 subjects. A small negative cross-validated gain is compatible with adding an irrelevant predictor: it can slightly worsen held-out prediction without implying an "anti-guidance" mechanism.
 
-Writeback is deliberately not promoted to a primary group endpoint because healthy subject `h14` already produced an extreme negative value (`-0.45241`), revealing numerical fragility in that secondary score before patient results were inspected.
+**Verdict: `NO_GROUP_DIFFERENCE_IN_P1_PREDICTIVE_GAIN`.**
 
-Once both cohort receipts exist:
+See [`docs/PILOT_FIELD_SZ_GROUP_GATE.md`](docs/PILOT_FIELD_SZ_GROUP_GATE.md) and [`results/pilot_field_SZ_group_gate.json`](results/pilot_field_SZ_group_gate.json).
 
-```bash
-python pilot_field_group_gate.py \
-  results/pilot_field_SZ_healthy_batch.json \
-  results/pilot_field_SZ_schizophrenia_batch.json \
-  --out results/pilot_field_SZ_group_gate.json
-```
+## P2/writeback is not ready
 
-A significant result would mean only that this **sensor-space screening metric differs between groups**. It would not establish causal wave guidance, a schizophrenia mechanism, consciousness, or quantum physics.
+The current reverse-direction score asks whether fast spatial state improves prediction of future slow-flow state. Its present relative-MSE formulation is numerically fragile.
 
-## Event-conditioned gate
+- healthy `h14`: `-0.45241`
+- schizophrenia `s07`: `-5.07896`
+- cohort medians remain near `-0.003`
 
-Some EDF+ datasets contain task annotations. `pilot_field_batch.py` records those annotations but intentionally ignores them for the frozen whole-run P1 screen. `pilot_field_event_gate.py` is a separate gate for predefined task-vs-rest epochs; it does not reopen bands or lag after inspecting whole-run results.
+That pattern is a meter warning, not a biological result. The current classification is **`P2_WRITEBACK_ESTIMATOR_UNSTABLE`**. Do not use it for group claims until a replacement score is specified and validated before new outcomes are inspected.
+
+## Event-conditioned gate remains open
+
+Some EDF+ datasets contain predefined task annotations. `pilot_field_batch.py` records those annotations but intentionally ignores them for the frozen whole-run P1 screen.
+
+`pilot_field_event_gate.py` asks a different, separately frozen question: does the **same fixed measurement** differ between predefined task and rest epochs? It does not reopen bands, lag, reference or region after seeing the nulls.
+
+That is the next legitimate biological gate. Searching frequency/lag/region until something becomes significant is not.
 
 ## The hard EEG boundary
 
 Sensor-space traveling-wave structure can be distorted by reference choice, volume conduction, source mixing, spatial sampling, filters and waveform shape. Scalp beta/gamma is also vulnerable to EMG.
 
-So the stop rule is explicit:
+The stop rule is explicit:
 
 > **Do not rescue a null by searching bands, regions, lags, references, source models or smoothing choices until something becomes significant. Freeze the measurement first. Replicate second. Interpret last.**
 
