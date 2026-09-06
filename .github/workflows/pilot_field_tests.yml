@@ -1,0 +1,24 @@
+name: pilot-field-tests
+
+on:
+  push:
+    paths:
+      - 'pilot_field_metrics.py'
+      - 'tests/test_pilot_field_metrics.py'
+      - '.github/workflows/pilot_field_tests.yml'
+  pull_request:
+    paths:
+      - 'pilot_field_metrics.py'
+      - 'tests/test_pilot_field_metrics.py'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --upgrade pip
+      - run: pip install numpy scipy pytest
+      - run: python -m pytest -q tests/test_pilot_field_metrics.py
